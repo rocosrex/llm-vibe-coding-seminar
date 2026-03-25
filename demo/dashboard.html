@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025 매출 대시보드</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+        header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-bottom: 1px solid #334155;
+            padding: 24px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        header span {
+            color: #64748b;
+            font-size: 14px;
+        }
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            padding: 28px 40px 0;
+        }
+        .kpi-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 24px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+        .kpi-card .label {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .kpi-card .value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+        .kpi-card .sub {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 6px;
+        }
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            padding: 20px 40px;
+        }
+        .chart-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 24px;
+        }
+        .chart-card h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #cbd5e1;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 340px;
+        }
+        .row-2 {
+            grid-template-columns: 1fr 1fr;
+        }
+        .filter-bar {
+            padding: 0 40px;
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 8px 18px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: #1e293b;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: #3b82f6;
+            color: #fff;
+            border-color: #3b82f6;
+        }
+        .table-card {
+            margin: 0 40px 40px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .table-card h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #cbd5e1;
+            padding: 24px 24px 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: #0f172a;
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+        }
+        td {
+            padding: 12px 16px;
+            font-size: 14px;
+            border-top: 1px solid #1e293b;
+            color: #cbd5e1;
+        }
+        tr:hover td { background: #263248; }
+        .amount { text-align: right; font-variant-numeric: tabular-nums; }
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .badge-game { background: #1e3a5f; color: #38bdf8; }
+        .badge-cad { background: #3b1f5e; color: #a78bfa; }
+        .badge-iot { background: #1a3a2a; color: #4ade80; }
+        .badge-med { background: #3b1f1f; color: #fb7185; }
+        @media (max-width: 900px) {
+            .kpi-row { grid-template-columns: repeat(2, 1fr); }
+            .charts-grid, .row-2 { grid-template-columns: 1fr; }
+            .kpi-row, .charts-grid, .filter-bar, .table-card { padding-left: 16px; padding-right: 16px; margin-left: 0; margin-right: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>2025 매출 대시보드</h1>
+    <span>Sales Dashboard · 2025년 1월 – 12월</span>
+</header>
+
+<div class="kpi-row">
+    <div class="kpi-card">
+        <div class="label">총 매출액</div>
+        <div class="value" id="kpi-total">–</div>
+        <div class="sub" id="kpi-total-sub"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="label">총 판매 건수</div>
+        <div class="value" id="kpi-count">–</div>
+        <div class="sub">37건 거래</div>
+    </div>
+    <div class="kpi-card">
+        <div class="label">월평균 매출</div>
+        <div class="value" id="kpi-avg">–</div>
+        <div class="sub" id="kpi-avg-sub"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="label">최고 매출 월</div>
+        <div class="value" id="kpi-best">–</div>
+        <div class="sub" id="kpi-best-sub"></div>
+    </div>
+</div>
+
+<div class="filter-bar">
+    <button class="filter-btn active" data-filter="all">전체</button>
+    <button class="filter-btn" data-filter="게임">게임</button>
+    <button class="filter-btn" data-filter="CAD솔루션">CAD솔루션</button>
+    <button class="filter-btn" data-filter="IoT장비">IoT장비</button>
+    <button class="filter-btn" data-filter="의료SW">의료SW</button>
+</div>
+
+<div class="charts-grid">
+    <div class="chart-card">
+        <h2>월별 매출 추이</h2>
+        <div class="chart-container"><canvas id="monthlyChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+        <h2>카테고리별 매출 비중</h2>
+        <div class="chart-container"><canvas id="categoryChart"></canvas></div>
+    </div>
+</div>
+<div class="charts-grid row-2">
+    <div class="chart-card">
+        <h2>제품별 매출</h2>
+        <div class="chart-container"><canvas id="productChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+        <h2>지역별 매출</h2>
+        <div class="chart-container"><canvas id="regionChart"></canvas></div>
+    </div>
+</div>
+
+<div class="table-card">
+    <h2>거래 상세 내역</h2>
+    <div style="overflow-x:auto; max-height:400px; overflow-y:auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>날짜</th>
+                    <th>제품</th>
+                    <th>카테고리</th>
+                    <th>지역</th>
+                    <th class="amount">매출액</th>
+                    <th class="amount">수량</th>
+                    <th class="amount">단가</th>
+                </tr>
+            </thead>
+            <tbody id="data-table"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+const csvData = `날짜,제품,카테고리,지역,매출액,판매수량,단가
+2025-01-05,Block Planet Pro,게임,서울,4500000,150,30000
+2025-01-12,DECATS 라이선스,CAD솔루션,대전,12000000,4,3000000
+2025-01-20,센서측정 시스템,IoT장비,부산,8500000,5,1700000
+2025-02-03,Block Planet Pro,게임,경기,3200000,107,29907
+2025-02-15,DECATS 라이선스,CAD솔루션,서울,15000000,5,3000000
+2025-02-22,AR수술 시뮬레이터,의료SW,서울,22000000,2,11000000
+2025-03-08,Block Planet Pro,게임,부산,2800000,93,30108
+2025-03-14,센서측정 시스템,IoT장비,대전,10200000,6,1700000
+2025-03-25,DECATS 라이선스,CAD솔루션,경기,9000000,3,3000000
+2025-04-02,Block Planet Pro,게임,서울,5100000,170,30000
+2025-04-18,AR수술 시뮬레이터,의료SW,부산,11000000,1,11000000
+2025-04-28,센서측정 시스템,IoT장비,서울,13600000,8,1700000
+2025-05-05,Block Planet Pro,게임,경기,4800000,160,30000
+2025-05-12,DECATS 라이선스,CAD솔루션,대전,18000000,6,3000000
+2025-05-20,센서측정 시스템,IoT장비,부산,8500000,5,1700000
+2025-06-01,Block Planet Pro,게임,서울,6300000,210,30000
+2025-06-15,AR수술 시뮬레이터,의료SW,서울,33000000,3,11000000
+2025-06-22,DECATS 라이선스,CAD솔루션,경기,12000000,4,3000000
+2025-07-03,Block Planet Pro,게임,부산,3900000,130,30000
+2025-07-14,센서측정 시스템,IoT장비,대전,11900000,7,1700000
+2025-07-25,DECATS 라이선스,CAD솔루션,서울,21000000,7,3000000
+2025-08-05,Block Planet Pro,게임,서울,7200000,240,30000
+2025-08-12,AR수술 시뮬레이터,의료SW,경기,22000000,2,11000000
+2025-08-20,센서측정 시스템,IoT장비,부산,10200000,6,1700000
+2025-09-02,Block Planet Pro,게임,경기,5400000,180,30000
+2025-09-15,DECATS 라이선스,CAD솔루션,대전,24000000,8,3000000
+2025-09-22,센서측정 시스템,IoT장비,서울,15300000,9,1700000
+2025-10-01,Block Planet Pro,게임,서울,8100000,270,30000
+2025-10-14,AR수술 시뮬레이터,의료SW,부산,11000000,1,11000000
+2025-10-25,DECATS 라이선스,CAD솔루션,경기,15000000,5,3000000
+2025-11-03,Block Planet Pro,게임,부산,6000000,200,30000
+2025-11-12,센서측정 시스템,IoT장비,대전,13600000,8,1700000
+2025-11-22,DECATS 라이선스,CAD솔루션,서울,18000000,6,3000000
+2025-12-01,Block Planet Pro,게임,서울,9600000,320,30000
+2025-12-10,AR수술 시뮬레이터,의료SW,서울,44000000,4,11000000
+2025-12-18,센서측정 시스템,IoT장비,경기,11900000,7,1700000
+2025-12-28,DECATS 라이선스,CAD솔루션,대전,21000000,7,3000000`;
+
+// Parse CSV
+const rows = csvData.trim().split('\n').slice(1).map(line => {
+    const [날짜, 제품, 카테고리, 지역, 매출액, 판매수량, 단가] = line.split(',');
+    return { 날짜, 제품, 카테고리, 지역, 매출액: +매출액, 판매수량: +판매수량, 단가: +단가 };
+});
+
+const fmt = n => new Intl.NumberFormat('ko-KR').format(n);
+const fmtShort = n => {
+    if (n >= 100000000) return (n / 100000000).toFixed(1) + '억';
+    if (n >= 10000) return (n / 10000).toFixed(0) + '만';
+    return fmt(n);
+};
+
+const MONTHS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+const COLORS = {
+    '게임':     { bg: 'rgba(56,189,248,0.7)',  border: '#38bdf8' },
+    'CAD솔루션': { bg: 'rgba(167,139,250,0.7)', border: '#a78bfa' },
+    'IoT장비':  { bg: 'rgba(74,222,128,0.7)',  border: '#4ade80' },
+    '의료SW':   { bg: 'rgba(251,113,133,0.7)', border: '#fb7185' },
+};
+const BADGE_CLASS = { '게임':'badge-game', 'CAD솔루션':'badge-cad', 'IoT장비':'badge-iot', '의료SW':'badge-med' };
+
+const chartDefaults = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+        legend: { labels: { color: '#94a3b8', font: { size: 12 } } },
+        tooltip: {
+            backgroundColor: '#1e293b',
+            titleColor: '#f1f5f9',
+            bodyColor: '#cbd5e1',
+            borderColor: '#334155',
+            borderWidth: 1,
+            padding: 12,
+            callbacks: { label: ctx => {
+                const v = ctx.parsed?.y ?? ctx.parsed;
+                return ` ${ctx.dataset.label || ctx.label}: ₩${fmt(v)}`;
+            }}
+        }
+    },
+    scales: {
+        x: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } },
+        y: { ticks: { color: '#64748b', callback: v => fmtShort(v) }, grid: { color: '#1e293b33' } }
+    }
+};
+
+let monthlyChart, categoryChart, productChart, regionChart;
+let activeFilter = 'all';
+
+function filtered() {
+    return activeFilter === 'all' ? rows : rows.filter(r => r.카테고리 === activeFilter);
+}
+
+function monthlyData(data) {
+    const m = Array(12).fill(0);
+    data.forEach(r => { m[+r.날짜.split('-')[1] - 1] += r.매출액; });
+    return m;
+}
+
+function groupSum(data, key) {
+    const g = {};
+    data.forEach(r => { g[r[key]] = (g[r[key]] || 0) + r.매출액; });
+    return g;
+}
+
+function updateKPIs(data) {
+    const total = data.reduce((s, r) => s + r.매출액, 0);
+    const monthly = monthlyData(data);
+    const avg = total / 12;
+    const bestIdx = monthly.indexOf(Math.max(...monthly));
+
+    document.getElementById('kpi-total').textContent = '₩' + fmtShort(total);
+    document.getElementById('kpi-total-sub').textContent = `₩${fmt(total)}`;
+    document.getElementById('kpi-count').textContent = data.length + '건';
+    document.getElementById('kpi-avg').textContent = '₩' + fmtShort(avg);
+    document.getElementById('kpi-avg-sub').textContent = `₩${fmt(Math.round(avg))}`;
+    document.getElementById('kpi-best').textContent = MONTHS[bestIdx];
+    document.getElementById('kpi-best-sub').textContent = `₩${fmtShort(monthly[bestIdx])}`;
+}
+
+function updateTable(data) {
+    const tbody = document.getElementById('data-table');
+    tbody.innerHTML = data.map(r => `<tr>
+        <td>${r.날짜}</td>
+        <td>${r.제품}</td>
+        <td><span class="badge ${BADGE_CLASS[r.카테고리]}">${r.카테고리}</span></td>
+        <td>${r.지역}</td>
+        <td class="amount">₩${fmt(r.매출액)}</td>
+        <td class="amount">${fmt(r.판매수량)}</td>
+        <td class="amount">₩${fmt(r.단가)}</td>
+    </tr>`).join('');
+}
+
+function buildCharts() {
+    const data = filtered();
+    updateKPIs(data);
+    updateTable(data);
+
+    // Monthly chart — stacked bar by category
+    const categories = [...new Set(rows.map(r => r.카테고리))];
+    const datasets = (activeFilter === 'all' ? categories : [activeFilter]).map(cat => {
+        const m = Array(12).fill(0);
+        data.filter(r => r.카테고리 === cat).forEach(r => { m[+r.날짜.split('-')[1] - 1] += r.매출액; });
+        return {
+            label: cat,
+            data: m,
+            backgroundColor: COLORS[cat].bg,
+            borderColor: COLORS[cat].border,
+            borderWidth: 1,
+            borderRadius: 4,
+        };
+    });
+
+    if (monthlyChart) monthlyChart.destroy();
+    monthlyChart = new Chart(document.getElementById('monthlyChart'), {
+        type: 'bar',
+        data: { labels: MONTHS, datasets },
+        options: {
+            ...chartDefaults,
+            plugins: { ...chartDefaults.plugins, legend: { ...chartDefaults.plugins.legend, position: 'top' } },
+            scales: {
+                ...chartDefaults.scales,
+                x: { ...chartDefaults.scales.x, stacked: true },
+                y: { ...chartDefaults.scales.y, stacked: true, beginAtZero: true }
+            },
+            onClick: (e, els) => {
+                if (els.length) {
+                    const idx = els[0].index;
+                    alert(`${MONTHS[idx]} 매출: ₩${fmt(datasets.reduce((s, d) => s + d.data[idx], 0))}`);
+                }
+            }
+        }
+    });
+
+    // Category doughnut
+    const catData = groupSum(data, '카테고리');
+    if (categoryChart) categoryChart.destroy();
+    categoryChart = new Chart(document.getElementById('categoryChart'), {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(catData),
+            datasets: [{
+                data: Object.values(catData),
+                backgroundColor: Object.keys(catData).map(k => COLORS[k].bg),
+                borderColor: Object.keys(catData).map(k => COLORS[k].border),
+                borderWidth: 2,
+                hoverOffset: 16,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '60%',
+            plugins: {
+                legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 16, font: { size: 12 } } },
+                tooltip: chartDefaults.plugins.tooltip,
+            }
+        }
+    });
+
+    // Product horizontal bar
+    const prodData = groupSum(data, '제품');
+    const prodEntries = Object.entries(prodData).sort((a, b) => b[1] - a[1]);
+    if (productChart) productChart.destroy();
+    productChart = new Chart(document.getElementById('productChart'), {
+        type: 'bar',
+        data: {
+            labels: prodEntries.map(e => e[0]),
+            datasets: [{
+                label: '매출액',
+                data: prodEntries.map(e => e[1]),
+                backgroundColor: ['rgba(56,189,248,0.7)','rgba(167,139,250,0.7)','rgba(74,222,128,0.7)','rgba(251,113,133,0.7)'],
+                borderColor: ['#38bdf8','#a78bfa','#4ade80','#fb7185'],
+                borderWidth: 1,
+                borderRadius: 4,
+            }]
+        },
+        options: {
+            ...chartDefaults,
+            indexAxis: 'y',
+            plugins: { ...chartDefaults.plugins, legend: { display: false } },
+            scales: {
+                x: { ...chartDefaults.scales.y, beginAtZero: true, ticks: { color: '#64748b', callback: v => fmtShort(v) }, grid: { color: '#1e293b33' } },
+                y: { ...chartDefaults.scales.x, ticks: { color: '#94a3b8', font: { size: 12 } }, grid: { display: false } },
+            }
+        }
+    });
+
+    // Region bar
+    const regData = groupSum(data, '지역');
+    const regEntries = Object.entries(regData).sort((a, b) => b[1] - a[1]);
+    if (regionChart) regionChart.destroy();
+    regionChart = new Chart(document.getElementById('regionChart'), {
+        type: 'bar',
+        data: {
+            labels: regEntries.map(e => e[0]),
+            datasets: [{
+                label: '매출액',
+                data: regEntries.map(e => e[1]),
+                backgroundColor: 'rgba(99,102,241,0.7)',
+                borderColor: '#6366f1',
+                borderWidth: 1,
+                borderRadius: 4,
+            }]
+        },
+        options: {
+            ...chartDefaults,
+            plugins: { ...chartDefaults.plugins, legend: { display: false } },
+            scales: { ...chartDefaults.scales, y: { ...chartDefaults.scales.y, beginAtZero: true } }
+        }
+    });
+}
+
+// Filter buttons
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.filter;
+        buildCharts();
+    });
+});
+
+buildCharts();
+</script>
+</body>
+</html>
