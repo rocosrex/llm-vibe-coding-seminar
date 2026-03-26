@@ -1,0 +1,1685 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이태권 | Software Architect & R&D Director</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a2e;
+            --accent: #00d4ff;
+            --accent-glow: rgba(0, 212, 255, 0.3);
+            --accent-secondary: #7b2ff7;
+            --accent-tertiary: #ff6b6b;
+            --text-primary: #f0f0f5;
+            --text-secondary: #a0a0b8;
+            --text-muted: #6a6a80;
+            --border: rgba(255, 255, 255, 0.06);
+            --gradient-1: linear-gradient(135deg, #00d4ff, #7b2ff7);
+            --gradient-2: linear-gradient(135deg, #7b2ff7, #ff6b6b);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent) var(--bg-primary);
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.7;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(10, 10, 15, 0.6);
+        }
+
+        nav.scrolled {
+            padding: 0.7rem 2rem;
+            background: rgba(10, 10, 15, 0.95);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 400;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-1);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover { color: var(--text-primary); }
+        .nav-links a:hover::after { width: 100%; }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 5px;
+        }
+        .hamburger span {
+            width: 25px;
+            height: 2px;
+            background: var(--text-primary);
+            transition: 0.3s;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 6rem 2rem 4rem;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .hero-bg .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .hero-bg .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: var(--accent);
+            top: -10%;
+            right: -5%;
+            animation-delay: 0s;
+        }
+
+        .hero-bg .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-secondary);
+            bottom: -15%;
+            left: -10%;
+            animation-delay: -4s;
+        }
+
+        .hero-bg .orb-3 {
+            width: 300px;
+            height: 300px;
+            background: var(--accent-tertiary);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -2s;
+            opacity: 0.15;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.05); }
+            66% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.2rem;
+            background: rgba(0, 212, 255, 0.08);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--accent);
+            margin-bottom: 2rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .hero-badge .dot {
+            width: 8px;
+            height: 8px;
+            background: #00ff88;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,255,136,0.4); }
+            50% { opacity: 0.7; box-shadow: 0 0 0 8px rgba(0,255,136,0); }
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -2px;
+        }
+
+        .hero h1 .gradient-text {
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            color: var(--text-secondary);
+            max-width: 650px;
+            margin: 0 auto 2.5rem;
+            font-weight: 300;
+            line-height: 1.8;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 0.3rem;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.9rem 2rem;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient-1);
+            color: #000;
+            border: none;
+            box-shadow: 0 4px 25px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 40px var(--accent-glow);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--accent);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        /* Section Styles */
+        section {
+            padding: 6rem 2rem;
+            position: relative;
+        }
+
+        .section-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .section-divider {
+            width: 60px;
+            height: 3px;
+            background: var(--gradient-1);
+            margin: 1.5rem auto 0;
+            border-radius: 2px;
+        }
+
+        /* About Section */
+        #about {
+            background: var(--bg-secondary);
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .about-visual {
+            position: relative;
+        }
+
+        .about-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-1);
+        }
+
+        .about-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 20px;
+            background: var(--gradient-1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 900;
+            color: #000;
+            margin-bottom: 1.5rem;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .about-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .about-role {
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .about-info-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .about-info-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .about-info-list .icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(0, 212, 255, 0.08);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1rem;
+        }
+
+        .about-text h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .about-text p {
+            color: var(--text-secondary);
+            margin-bottom: 1.2rem;
+            font-size: 0.95rem;
+        }
+
+        .about-highlights {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .highlight-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.2rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .highlight-item:hover {
+            border-color: var(--accent);
+            transform: translateY(-3px);
+        }
+
+        .highlight-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight-title {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* Skills Section */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .skill-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skill-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient-1);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .skill-card:hover {
+            border-color: rgba(0, 212, 255, 0.3);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .skill-card:hover::before { opacity: 1; }
+
+        .skill-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .skill-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .skill-card p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .skill-tag {
+            padding: 0.25rem 0.7rem;
+            background: rgba(0, 212, 255, 0.06);
+            border: 1px solid rgba(0, 212, 255, 0.15);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Timeline / Career Section */
+        #career {
+            background: var(--bg-secondary);
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 3rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--accent), var(--accent-secondary), transparent);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2.5rem;
+            padding-left: 1rem;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.6s ease;
+        }
+
+        .timeline-item.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -3.55rem;
+            top: 0.5rem;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
+            border: 3px solid var(--bg-secondary);
+        }
+
+        .timeline-date {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--accent);
+            margin-bottom: 0.3rem;
+        }
+
+        .timeline-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .timeline-company {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .timeline-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            margin-top: 0.8rem;
+        }
+
+        /* Projects Section */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .project-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.4s;
+            cursor: default;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(123, 47, 247, 0.3);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .project-banner {
+            height: 8px;
+            background: var(--gradient-1);
+        }
+
+        .project-card:nth-child(2) .project-banner { background: var(--gradient-2); }
+        .project-card:nth-child(3) .project-banner { background: linear-gradient(135deg, #ff6b6b, #ffd93d); }
+        .project-card:nth-child(4) .project-banner { background: linear-gradient(135deg, #00ff88, #00d4ff); }
+        .project-card:nth-child(5) .project-banner { background: linear-gradient(135deg, #ff6b6b, #7b2ff7); }
+        .project-card:nth-child(6) .project-banner { background: linear-gradient(135deg, #ffd93d, #00d4ff); }
+
+        .project-content {
+            padding: 1.5rem;
+        }
+
+        .project-category {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .project-card p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        /* Awards Section */
+        .awards-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .award-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+            transition: all 0.3s;
+        }
+
+        .award-card:hover {
+            border-color: rgba(255, 215, 0, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .award-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            background: rgba(255, 215, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .award-card h3 {
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .award-card p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Tech Stack Marquee */
+        .tech-marquee {
+            overflow: hidden;
+            padding: 2rem 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            margin: 3rem 0;
+        }
+
+        .marquee-track {
+            display: flex;
+            gap: 3rem;
+            animation: marquee 30s linear infinite;
+            width: max-content;
+        }
+
+        .marquee-item {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            transition: color 0.3s;
+        }
+
+        .marquee-item:hover {
+            color: var(--accent);
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* Contact Section */
+        #contact {
+            background: var(--bg-secondary);
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .contact-info h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .contact-info p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        .contact-links {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .contact-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.3s;
+        }
+
+        .contact-link:hover {
+            border-color: var(--accent);
+            transform: translateX(5px);
+        }
+
+        .contact-link .c-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(0, 212, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .contact-link .c-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .contact-link .c-value {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .contact-form-wrapper {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+        }
+
+        .contact-form-wrapper h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 0.9rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .form-group textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .form-submit {
+            width: 100%;
+            padding: 1rem;
+            background: var(--gradient-1);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        .form-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--accent-glow);
+        }
+
+        /* Footer */
+        footer {
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+        }
+
+        footer p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        footer .footer-tagline {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* Scroll Animations */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hamburger { display: flex; }
+
+            .nav-links.active {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(10, 10, 15, 0.98);
+                padding: 1rem 2rem 2rem;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+            .contact-grid { grid-template-columns: 1fr; }
+            .awards-list { grid-template-columns: 1fr; }
+            .projects-grid { grid-template-columns: 1fr; }
+            .hero-stats { gap: 1.5rem; }
+            .hero-cta { flex-direction: column; align-items: center; }
+        }
+
+        /* Particle Canvas */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        section, nav, footer {
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particles"></canvas>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-inner">
+            <div class="nav-logo">&lt;TK.Lee /&gt;</div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#about">About</a></li>
+                <li><a href="#skills">Skills</a></li>
+                <li><a href="#career">Career</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-bg">
+            <div class="orb orb-1"></div>
+            <div class="orb orb-2"></div>
+            <div class="orb orb-3"></div>
+        </div>
+        <div class="hero-grid"></div>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="dot"></span>
+                로코스(주) 연구소장
+            </div>
+            <h1>
+                Building the<br>
+                <span class="gradient-text">Impossible</span>
+            </h1>
+            <p class="hero-subtitle">
+                26년간 CAD, 3D, AR/VR, IoT, 로봇, AI까지 —<br>
+                소프트웨어로 현실 세계의 문제를 해결하는 엔지니어, <strong>이태권</strong>입니다.
+            </p>
+            <div class="hero-cta">
+                <a href="#contact" class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    연락하기
+                </a>
+                <a href="#projects" class="btn btn-outline">프로젝트 보기 &darr;</a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-number" data-count="26">0</div>
+                    <div class="stat-label">Years Experience</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-count="50">0</div>
+                    <div class="stat-label">Projects Done</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-count="8">0</div>
+                    <div class="stat-label">Tech Domains</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Marquee -->
+    <div class="tech-marquee">
+        <div class="marquee-track">
+            <span class="marquee-item">C++</span>
+            <span class="marquee-item">C#</span>
+            <span class="marquee-item">Python</span>
+            <span class="marquee-item">Unity3D</span>
+            <span class="marquee-item">AutoCAD ObjectARX</span>
+            <span class="marquee-item">AR / VR</span>
+            <span class="marquee-item">HoloLens</span>
+            <span class="marquee-item">IoT</span>
+            <span class="marquee-item">ROS</span>
+            <span class="marquee-item">DirectX</span>
+            <span class="marquee-item">OpenGL</span>
+            <span class="marquee-item">ASP.NET</span>
+            <span class="marquee-item">Flutter</span>
+            <span class="marquee-item">YOLO AI</span>
+            <span class="marquee-item">MS Azure</span>
+            <span class="marquee-item">AWS</span>
+            <!-- Duplicate for seamless loop -->
+            <span class="marquee-item">C++</span>
+            <span class="marquee-item">C#</span>
+            <span class="marquee-item">Python</span>
+            <span class="marquee-item">Unity3D</span>
+            <span class="marquee-item">AutoCAD ObjectARX</span>
+            <span class="marquee-item">AR / VR</span>
+            <span class="marquee-item">HoloLens</span>
+            <span class="marquee-item">IoT</span>
+            <span class="marquee-item">ROS</span>
+            <span class="marquee-item">DirectX</span>
+            <span class="marquee-item">OpenGL</span>
+            <span class="marquee-item">ASP.NET</span>
+            <span class="marquee-item">Flutter</span>
+            <span class="marquee-item">YOLO AI</span>
+            <span class="marquee-item">MS Azure</span>
+            <span class="marquee-item">AWS</span>
+        </div>
+    </div>
+
+    <!-- About -->
+    <section id="about">
+        <div class="section-inner">
+            <div class="section-header fade-up">
+                <div class="section-tag">About Me</div>
+                <h2 class="section-title">코드로 세상을 설계하다</h2>
+                <div class="section-divider"></div>
+            </div>
+            <div class="about-grid">
+                <div class="about-visual fade-up">
+                    <div class="about-card">
+                        <div class="about-avatar">TK</div>
+                        <div class="about-name">이태권 (Taekwon Lee)</div>
+                        <div class="about-role">R&D Director @ Rocos Co., Ltd.</div>
+                        <ul class="about-info-list">
+                            <li>
+                                <div class="icon">&#x1f4cd;</div>
+                                <span>서울특별시</span>
+                            </li>
+                            <li>
+                                <div class="icon">&#x2709;</div>
+                                <span>rocos.rex@gmail.com</span>
+                            </li>
+                            <li>
+                                <div class="icon">&#x1f393;</div>
+                                <span>인천대학교 토목공학과 대학원</span>
+                            </li>
+                            <li>
+                                <div class="icon">&#x1f4bc;</div>
+                                <span>26년+ 소프트웨어 개발 경력</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="about-text fade-up">
+                    <h3>엔지니어링과 소프트웨어의 교차점에서</h3>
+                    <p>
+                        중학교 1학년 때 독학으로 프로그래밍을 시작한 이래, 토목공학의 전문 지식과
+                        소프트웨어 개발 역량을 결합하여 현실 세계의 복잡한 문제를 해결해 왔습니다.
+                    </p>
+                    <p>
+                        KTX 고속철도 설계 소프트웨어부터 JTBC 선거 방송 시스템,
+                        외과 수술 AR, 스마트 무인선까지 — 항상 기술의 경계를 넘어
+                        새로운 가능성을 탐색합니다.
+                    </p>
+                    <div class="about-highlights">
+                        <div class="highlight-item">
+                            <div class="highlight-icon">&#x1f682;</div>
+                            <div class="highlight-title">철도 인프라</div>
+                        </div>
+                        <div class="highlight-item">
+                            <div class="highlight-icon">&#x1f916;</div>
+                            <div class="highlight-title">로봇 & IoT</div>
+                        </div>
+                        <div class="highlight-item">
+                            <div class="highlight-icon">&#x1f3ae;</div>
+                            <div class="highlight-title">3D / VR / AR</div>
+                        </div>
+                        <div class="highlight-item">
+                            <div class="highlight-icon">&#x1f9e0;</div>
+                            <div class="highlight-title">AI & 자동화</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills -->
+    <section id="skills">
+        <div class="section-inner">
+            <div class="section-header fade-up">
+                <div class="section-tag">Expertise</div>
+                <h2 class="section-title">기술 전문 분야</h2>
+                <div class="section-divider"></div>
+            </div>
+            <div class="skills-grid">
+                <div class="skill-card fade-up">
+                    <div class="skill-icon" style="background: rgba(0,212,255,0.1);">&#x1f4d0;</div>
+                    <h3>CAD & 설계 자동화</h3>
+                    <p>AutoCAD ObjectARX 기반 3rd Party 개발, Civil3D 한국형 확장팩, 설계 자동화 시스템 다수 구축</p>
+                    <div class="skill-tags">
+                        <span class="skill-tag">ObjectARX</span>
+                        <span class="skill-tag">Civil3D</span>
+                        <span class="skill-tag">ODA Teigha</span>
+                        <span class="skill-tag">OpenSCAD</span>
+                    </div>
+                </div>
+                <div class="skill-card fade-up">
+                    <div class="skill-icon" style="background: rgba(123,47,247,0.1);">&#x1f3ae;</div>
+                    <h3>3D & VR / AR</h3>
+                    <p>Unity3D, DirectX, OpenGL 기반 3D 렌더링 및 가상/증강현실 솔루션 개발</p>
+                    <div class="skill-tags">
+                        <span class="skill-tag">Unity3D</span>
+                        <span class="skill-tag">DirectX</span>
+                        <span class="skill-tag">OpenGL</span>
+                        <span class="skill-tag">HoloLens</span>
+                    </div>
+                </div>
+                <div class="skill-card fade-up">
+                    <div class="skill-icon" style="background: rgba(255,107,107,0.1);">&#x1f916;</div>
+                    <h3>IoT & 로보틱스</h3>
+                    <p>Arduino, Raspberry PI, ROS 기반 자동화 시스템 및 로봇 제어 소프트웨어 개발</p>
+                    <div class="skill-tags">
+                        <span class="skill-tag">ROS</span>
+                        <span class="skill-tag">Arduino</span>
+                        <span class="skill-tag">Raspberry PI</span>
+                        <span class="skill-tag">PLC</span>
+                    </div>
+                </div>
+                <div class="skill-card fade-up">
+                    <div class="skill-icon" style="background: rgba(0,255,136,0.1);">&#x1f310;</div>
+                    <h3>웹 & 모바일</h3>
+                    <p>ASP.NET MVC, Flutter, Xamarin 기반 풀스택 웹/모바일 애플리케이션 개발</p>
+                    <div class="skill-tags">
+                        <span class="skill-tag">ASP.NET</span>
+                        <span class="skill-tag">Flutter</span>
+                        <span class="skill-tag">Xamarin</span>
+                        <span class="skill-tag">REST API</span>
+                    </div>
+                </div>
+                <div class="skill-card fade-up">
+                    <div class="skill-icon" style="background: rgba(255,217,61,0.1);">&#x1f9e0;</div>
+                    <h3>AI & 데이터</h3>
+                    <p>YOLO 객체 인식, DBSCAN 클러스터링, LiDAR 센서 데이터 처리 및 분석</p>
+                    <div class="skill-tags">
+                        <span class="skill-tag">YOLO</span>
+                        <span class="skill-tag">DBSCAN</span>
+                        <span class="skill-tag">LiDAR</span>
+                        <span class="skill-tag">Python</span>
+                    </div>
+                </div>
+                <div class="skill-card fade-up">
+                    <div class="skill-icon" style="background: rgba(0,212,255,0.1);">&#x2601;</div>
+                    <h3>클라우드 & 인프라</h3>
+                    <p>AWS, MS Azure 기반 서버 구축 및 데이터베이스 설계/운영</p>
+                    <div class="skill-tags">
+                        <span class="skill-tag">AWS</span>
+                        <span class="skill-tag">Azure</span>
+                        <span class="skill-tag">MS-SQL</span>
+                        <span class="skill-tag">Oracle</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Career -->
+    <section id="career">
+        <div class="section-inner">
+            <div class="section-header fade-up">
+                <div class="section-tag">Career</div>
+                <h2 class="section-title">커리어 여정</h2>
+                <div class="section-divider"></div>
+            </div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-date">2020.06 — 현재</div>
+                    <div class="timeline-title">연구소장</div>
+                    <div class="timeline-company">로코스(주)</div>
+                    <div class="timeline-desc">
+                        SI 및 R&D 과제 리더. 고속철도 장주도 설계 통합, LiDAR 데이터 클러스터링,
+                        ERP 시스템, 모바일 게임, RPA 프로젝트 등 다수 수행.
+                    </div>
+                    <div class="timeline-tags">
+                        <span class="skill-tag">C++</span>
+                        <span class="skill-tag">C#</span>
+                        <span class="skill-tag">Python</span>
+                        <span class="skill-tag">Flutter</span>
+                        <span class="skill-tag">Unity3D</span>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2017.07 — 2020.06</div>
+                    <div class="timeline-title">프리랜서 개발자</div>
+                    <div class="timeline-company">다양한 프로젝트</div>
+                    <div class="timeline-desc">
+                        JTBC 2020 총선 선거방송 터치스크린, 지하철 디지털 사이니지,
+                        전차선 모니터링 시스템, K277 전차 소스 검증, 외과 수술 AR 등 수행.
+                    </div>
+                    <div class="timeline-tags">
+                        <span class="skill-tag">Unity3D</span>
+                        <span class="skill-tag">HoloLens</span>
+                        <span class="skill-tag">IoT</span>
+                        <span class="skill-tag">AR</span>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2006.02 — 2016.07</div>
+                    <div class="timeline-title">대표이사</div>
+                    <div class="timeline-company">렉스하이테크</div>
+                    <div class="timeline-desc">
+                        본인이 창업한 SI/R&D 기업. KTX 고속철도 장주도 설계, 스마트 무인선,
+                        CAD 솔루션, VR/3D 시스템 등 핵심 프로젝트 다수 주도.
+                    </div>
+                    <div class="timeline-tags">
+                        <span class="skill-tag">CAD</span>
+                        <span class="skill-tag">PLC</span>
+                        <span class="skill-tag">ROS</span>
+                        <span class="skill-tag">3D</span>
+                        <span class="skill-tag">Kinect</span>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2001.03 — 2006.02</div>
+                    <div class="timeline-title">연구소장</div>
+                    <div class="timeline-company">한국인프라</div>
+                    <div class="timeline-desc">
+                        Autodesk Civil3D 한국형 확장팩 개발 주도. 한국 토목 시장에
+                        Civil3D를 성공적으로 안착시킨 핵심 인물.
+                    </div>
+                    <div class="timeline-tags">
+                        <span class="skill-tag">Civil3D</span>
+                        <span class="skill-tag">ObjectARX</span>
+                        <span class="skill-tag">VR</span>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">1998.03 — 2001.03</div>
+                    <div class="timeline-title">대리 (솔루션 개발)</div>
+                    <div class="timeline-company">삼안건설기술공사</div>
+                    <div class="timeline-desc">
+                        도로 설계 자동화 시스템 및 농업시설유지관리시스템 개발.
+                        Geometry Core Logic 기반 기술 습득.
+                    </div>
+                    <div class="timeline-tags">
+                        <span class="skill-tag">C/C++</span>
+                        <span class="skill-tag">Visual Basic</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects -->
+    <section id="projects">
+        <div class="section-inner">
+            <div class="section-header fade-up">
+                <div class="section-tag">Featured Work</div>
+                <h2 class="section-title">대표 프로젝트</h2>
+                <div class="section-divider"></div>
+            </div>
+            <div class="projects-grid">
+                <div class="project-card fade-up">
+                    <div class="project-banner"></div>
+                    <div class="project-content">
+                        <div class="project-category">Broadcasting</div>
+                        <h3>JTBC 2020 총선 선거방송 터치스크린</h3>
+                        <p>Unity3D 기반 실시간 선거 개표 방송 시스템. 후보자 이력, 인터뷰 동영상,
+                        실시간 개표 결과, 비례대표 당선 예측까지 터치스크린 인터페이스로 구현.</p>
+                        <div class="skill-tags">
+                            <span class="skill-tag">Unity3D</span>
+                            <span class="skill-tag">C#</span>
+                            <span class="skill-tag">Oracle</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="project-card fade-up">
+                    <div class="project-banner"></div>
+                    <div class="project-content">
+                        <div class="project-category">Railway Infrastructure</div>
+                        <h3>KTX 고속철도 장주도 설계 시스템</h3>
+                        <p>경부선 KTX, 호남선 SRT에 실제 사용된 400/350/300/250km/h급
+                        고속열차 전차선 설계 프로그램. AutoCAD 기반 설계 자동화.</p>
+                        <div class="skill-tags">
+                            <span class="skill-tag">C++</span>
+                            <span class="skill-tag">AutoCAD</span>
+                            <span class="skill-tag">ObjectARX</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="project-card fade-up">
+                    <div class="project-banner"></div>
+                    <div class="project-content">
+                        <div class="project-category">Medical AR</div>
+                        <h3>외과 수술 AR 지원 시스템</h3>
+                        <p>중앙대학병원과 협력하여 HoloLens 기반 증강현실 외과 수술 지원 시스템 개발.
+                        UWB Radar를 활용한 실내 측위 기술 접목.</p>
+                        <div class="skill-tags">
+                            <span class="skill-tag">HoloLens</span>
+                            <span class="skill-tag">Unity3D</span>
+                            <span class="skill-tag">UWB</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="project-card fade-up">
+                    <div class="project-banner"></div>
+                    <div class="project-content">
+                        <div class="project-category">Autonomous Vehicle</div>
+                        <h3>스마트 무인선 (Autonomous Ship)</h3>
+                        <p>측량 센서 탑재 자동항법 무인선. 수질센서 자동 채수, 엔진 자동 제어,
+                        3D 수심도 작성 기능을 갖춘 하천 측량 자동화 시스템.</p>
+                        <div class="skill-tags">
+                            <span class="skill-tag">ROS</span>
+                            <span class="skill-tag">Arduino</span>
+                            <span class="skill-tag">3D</span>
+                            <span class="skill-tag">ZigBee</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="project-card fade-up">
+                    <div class="project-banner"></div>
+                    <div class="project-content">
+                        <div class="project-category">LiDAR & AI</div>
+                        <h3>LiDAR 센서 데이터 클러스터링</h3>
+                        <p>LiDAR 센서 기반 포인트 클라우드 데이터를 DBSCAN 비학습 AI로
+                        클러스터링하고 정확도를 고도화하는 데이터 처리 시스템.</p>
+                        <div class="skill-tags">
+                            <span class="skill-tag">Python</span>
+                            <span class="skill-tag">DBSCAN</span>
+                            <span class="skill-tag">LiDAR</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="project-card fade-up">
+                    <div class="project-banner"></div>
+                    <div class="project-content">
+                        <div class="project-category">Digital Signage</div>
+                        <h3>지하철 스크린게이트 디지털 사이니지</h3>
+                        <p>레이저 프로젝터 기반 지하철 스크린도어 광고 시스템.
+                        광고 편성/원격 관리 서버 및 센서 연동 클라이언트 개발.</p>
+                        <div class="skill-tags">
+                            <span class="skill-tag">C#</span>
+                            <span class="skill-tag">DevExpress</span>
+                            <span class="skill-tag">MS-SQL</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Awards -->
+    <section id="awards">
+        <div class="section-inner">
+            <div class="section-header fade-up">
+                <div class="section-tag">Recognition</div>
+                <h2 class="section-title">수상 & 성과</h2>
+                <div class="section-divider"></div>
+            </div>
+            <div class="awards-list">
+                <div class="award-card fade-up">
+                    <div class="award-icon">&#x1f3c6;</div>
+                    <div>
+                        <h3>베스트 엔지니어상</h3>
+                        <p>Autodesk Korea — Civil3D 한국 시장 안착에 기여한 공로</p>
+                    </div>
+                </div>
+                <div class="award-card fade-up">
+                    <div class="award-icon">&#x1f6a2;</div>
+                    <div>
+                        <h3>드론 하천측량 경진대회 2위</h3>
+                        <p>국토교통부 주최 — 스마트 무인선 출품</p>
+                    </div>
+                </div>
+                <div class="award-card fade-up">
+                    <div class="award-icon">&#x1f682;</div>
+                    <div>
+                        <h3>KTX/SRT 설계 소프트웨어</h3>
+                        <p>경부선 KTX 및 호남선 SRT 유지보수에 실제 사용되는 설계 프로그램 개발</p>
+                    </div>
+                </div>
+                <div class="award-card fade-up">
+                    <div class="award-icon">&#x1f4fa;</div>
+                    <div>
+                        <h3>JTBC 선거방송 시스템</h3>
+                        <p>2020 총선 실시간 개표 방송 터치스크린 시스템 개발</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact">
+        <div class="section-inner">
+            <div class="section-header fade-up">
+                <div class="section-tag">Get in Touch</div>
+                <h2 class="section-title">함께 만들어 갈까요?</h2>
+                <div class="section-divider"></div>
+            </div>
+            <div class="contact-grid">
+                <div class="contact-info fade-up">
+                    <h3>새로운 프로젝트를 논의하고 싶으시다면</h3>
+                    <p>
+                        26년간 쌓아온 다양한 기술 경험을 바탕으로,
+                        여러분의 아이디어를 현실로 만들어 드립니다.
+                        언제든 편하게 연락해 주세요.
+                    </p>
+                    <div class="contact-links">
+                        <a href="mailto:rocos.rex@gmail.com" class="contact-link">
+                            <div class="c-icon">&#x2709;</div>
+                            <div>
+                                <div class="c-text">Email</div>
+                                <div class="c-value">rocos.rex@gmail.com</div>
+                            </div>
+                        </a>
+                        <a href="tel:010-6366-3590" class="contact-link">
+                            <div class="c-icon">&#x1f4f1;</div>
+                            <div>
+                                <div class="c-text">Phone</div>
+                                <div class="c-value">010-6366-3590</div>
+                            </div>
+                        </a>
+                        <div class="contact-link">
+                            <div class="c-icon">&#x1f4cd;</div>
+                            <div>
+                                <div class="c-text">Location</div>
+                                <div class="c-value">서울특별시</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-form-wrapper fade-up">
+                    <h3>메시지 보내기</h3>
+                    <form id="contactForm" onsubmit="handleSubmit(event)">
+                        <div class="form-group">
+                            <input type="text" placeholder="이름" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" placeholder="이메일" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" placeholder="제목">
+                        </div>
+                        <div class="form-group">
+                            <textarea placeholder="메시지를 입력해 주세요"></textarea>
+                        </div>
+                        <button type="submit" class="form-submit">보내기 &rarr;</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 이태권 (Taekwon Lee). All rights reserved.</p>
+        <p class="footer-tagline">&lt;/&gt; Built with passion &amp; 26 years of engineering.</p>
+    </footer>
+
+    <script>
+        // ====== Particles Background ======
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let mouse = { x: null, y: null };
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = (Math.random() - 0.5) * 0.5;
+                this.opacity = Math.random() * 0.5 + 0.1;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                ctx.fillStyle = `rgba(0, 212, 255, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            const count = Math.min(80, Math.floor(window.innerWidth * 0.05));
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function connectParticles() {
+            for (let a = 0; a < particles.length; a++) {
+                for (let b = a + 1; b < particles.length; b++) {
+                    const dx = particles[a].x - particles[b].x;
+                    const dy = particles[a].y - particles[b].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 120) {
+                        ctx.strokeStyle = `rgba(0, 212, 255, ${0.08 * (1 - dist / 120)})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[a].x, particles[a].y);
+                        ctx.lineTo(particles[b].x, particles[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            connectParticles();
+            requestAnimationFrame(animateParticles);
+        }
+
+        initParticles();
+        animateParticles();
+
+        // ====== Nav Scroll ======
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            nav.classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        // ====== Mobile Menu ======
+        function toggleMenu() {
+            document.getElementById('navLinks').classList.toggle('active');
+        }
+
+        // Close menu on link click
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('navLinks').classList.remove('active');
+            });
+        });
+
+        // ====== Scroll Animations ======
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        document.querySelectorAll('.fade-up, .timeline-item').forEach(el => observer.observe(el));
+
+        // ====== Stat Counter Animation ======
+        const statObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target;
+                    const target = parseInt(el.dataset.count);
+                    let current = 0;
+                    const increment = target / 60;
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= target) {
+                            el.textContent = target + '+';
+                            clearInterval(timer);
+                        } else {
+                            el.textContent = Math.floor(current) + '+';
+                        }
+                    }, 25);
+                    statObserver.unobserve(el);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.stat-number').forEach(el => statObserver.observe(el));
+
+        // ====== Form Handler ======
+        function handleSubmit(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('.form-submit');
+            btn.textContent = '전송 완료!';
+            btn.style.background = 'linear-gradient(135deg, #00ff88, #00d4ff)';
+            setTimeout(() => {
+                btn.textContent = '보내기 →';
+                btn.style.background = '';
+                e.target.reset();
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
